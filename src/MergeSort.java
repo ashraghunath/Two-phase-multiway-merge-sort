@@ -7,7 +7,7 @@ public class MergeSort {
 
     static int maxN = 100_000;
     static int fileNumber = 0;
-    static final String filename = "randomGenerate.txt";
+    static final String filename = "input.txt";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
