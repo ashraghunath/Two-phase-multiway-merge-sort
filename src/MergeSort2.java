@@ -7,6 +7,7 @@ public class MergeSort2 {
     static int maxN = 100_000;
     static final String filename = "input.txt";
     static int memorySize;
+    //static int maxFileCouldBeInMemory = 50;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -57,7 +58,7 @@ public class MergeSort2 {
         Random random = new Random();
 
         for (int i = 0; i < n; i++)
-            numbers[i] = random.nextInt(101); //Max 100
+            numbers[i] = random.nextInt(1000000); //Max 100
 
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filename));

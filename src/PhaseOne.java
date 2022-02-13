@@ -46,7 +46,8 @@ public class PhaseOne {
         }
         System.out.println();
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("Sorted"+(fileNumber+1)+".txt"));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("sortedFiles/Sorted"+(fileNumber+1)+
+                    ".txt"));
             for (int member = 0;member<numberOfElementsInArray;member++) {
                 bufferedWriter.write(Integer.toString(tempNumbers[member]));
                 bufferedWriter.write("\n");
