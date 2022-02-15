@@ -1,19 +1,32 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
 
-//Please create "sortedFiles" directory for storing sorted data.
 public class MergeSort {
 
     static int maxN = 100_000;
-    static int fileNumber = 0;
     static final String filename = "input.txt";
+    static int memorySize;
+    //static int maxFileCouldBeInMemory = 50;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+        System.gc();
+        Runtime runtime = Runtime.getRuntime();
+        System.out.println("System Available Memory: " + (float) (runtime.totalMemory() / 1000000) + " MB");
+
         Scanner scanner = new Scanner(System.in);
         int operation;
+        System.out.println("Please enter max number of integers in memory");
+        memorySize = Integer.parseInt(scanner.nextLine());
+//        memorySize=1000;
         do {
-            System.out.println("1.\tCreate a random list of integers");
+            System.out.println("\n1.\tCreate a random list of integers");
             System.out.println("2.\tDisplay the random list");
             System.out.println("3.\tRun 2PMMS");
             System.out.println("4.\tExit");
@@ -21,139 +34,33 @@ public class MergeSort {
             operation = Integer.parseInt(scanner.nextLine());
             if (operation == 1)
                 generateNumbersIntoFile(scanner);
-            else if (operation == 2)
-                displayRandomList();
+            else if (operation == 2) {
+                System.out.println("The Data in file is: ");
+                displayRandomList(filename);
+            }
             else if (operation == 3) {
-                phase1(20);
+                twoPMMS();
             }
         } while (operation != 4);
+
+        //cleanup files after use
+
+        File dir = new File("sortedFiles");
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            for (File file : files)
+                if (file.exists())
+                    file.delete();
+            dir.delete();
+        }
+
+
+        //close scanner
         scanner.close();
     }
 
-    public static void phase1(int memorySize) {
-        //int fileNumber=0;
-        int[] tempArray = new int[memorySize];
-        BufferedReader bufferedReader = null;
-        int numberOfElementsInArray = 0;
-        try {
-            bufferedReader = new BufferedReader(new FileReader(filename));
-            String number;
-            while((number = bufferedReader.readLine()) != null) {
-                if(numberOfElementsInArray == memorySize) {
-                    applySortingAndSave(tempArray,numberOfElementsInArray);
-                    numberOfElementsInArray=0;
-                }
-                tempArray[numberOfElementsInArray] = Integer.parseInt(number);
-                numberOfElementsInArray++;
-            }
-//            while ((number = bufferedReader.readLine()) != null && numberOfElementsInArray < memorySize) {
-//                tempArray[numberOfElementsInArray] = Integer.parseInt(number);
-//                numberOfElementsInArray++;
-//            }
-            applySortingAndSave(tempArray,numberOfElementsInArray);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bufferedReader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void applySortingAndSave(int[] unSorted, int numberOfElementsInArray) {
-        System.out.print("The member of Array (Before Sorted): ");
-        for(int member = 0;member<numberOfElementsInArray;member++) {
-            System.out.print(unSorted[member]+",");
-        }
-        System.out.println();
-        mergeSort(unSorted,0,numberOfElementsInArray-1);
-        System.out.print("The member of Array (After Sorted): ");
-        for(int member = 0;member<numberOfElementsInArray;member++) {
-            System.out.print(unSorted[member]+",");
-        }
-        System.out.println();
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("sortedFiles/Sorted"+fileNumber+".txt"));
-            for (int member = 0;member<numberOfElementsInArray;member++) {
-                bufferedWriter.write(Integer.toString(unSorted[member]));
-                bufferedWriter.write("\n");
-            }
-            bufferedWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        fileNumber++;
-    }
-
-    public static void displayRandomList() {
-        System.out.println("The Data in file is: ");
-        BufferedReader bufferedReader = null;
-        try {
-            bufferedReader = new BufferedReader(new FileReader(filename));
-            String number;
-            while ((number = bufferedReader.readLine()) != null) {
-                System.out.println(number);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bufferedReader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void mergeSort(int[] unSorted, int start, int end) {
-        if (start < end) {
-            int middle = (start + end) / 2;
-            mergeSort(unSorted, start, middle);
-            mergeSort(unSorted, middle + 1, end);
-            merge(unSorted, start, middle, end);
-        }
-    }
-
-    public static void merge(int[] unSorted, int start, int middle, int end) {
-        int leftArraySize = middle - start + 1;
-        int rightArraySize = end - middle;
-        int[] leftArray = new int[leftArraySize];
-        int[] rightArray = new int[rightArraySize];
-        for (int i = 0; i < leftArraySize; i++) {
-            leftArray[i] = unSorted[start + i];
-        }
-        for (int i = 0; i < rightArraySize; i++) {
-            rightArray[i] = unSorted[middle + 1 + i];
-        }
-        int i = 0, j = 0, k = start;
-        while (i < leftArraySize && j < rightArraySize) {
-            if (leftArray[i] < rightArray[j]) {
-                unSorted[k] = leftArray[i];
-                i++;
-            } else {
-                unSorted[k] = rightArray[j];
-                j++;
-            }
-            k++;
-        }
-        while (i < leftArraySize) {
-            unSorted[k] = leftArray[i];
-            k++;
-            i++;
-        }
-        while (j < rightArraySize) {
-            unSorted[k] = rightArray[j];
-            k++;
-            j++;
-        }
-    }
-
     public static void generateNumbersIntoFile(Scanner scanner) {
-        //Scanner scanner = new Scanner(System.in);
         int n;
-
         while (true) {
             System.out.print("Please enter the count of integers to generate > ");
             n = Integer.parseInt(scanner.nextLine());
@@ -168,7 +75,7 @@ public class MergeSort {
         Random random = new Random();
 
         for (int i = 0; i < n; i++)
-            numbers[i] = random.nextInt(101); //Max 100
+            numbers[i] = random.nextInt(1000000);
 
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filename));
@@ -180,6 +87,43 @@ public class MergeSort {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void displayRandomList(String filename) {
+
+        BufferedReader bufferedReader = null;
+        try {
+            bufferedReader = new BufferedReader(new FileReader(filename));
+            String number;
+            while ((number = bufferedReader.readLine()) != null) {
+                System.out.print(number + " ");
+            }
+            System.out.println();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bufferedReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void twoPMMS() throws IOException {
+
+        //create directory if it doesnt exist
+        File theDir = new File("sortedFiles");
+        if (!theDir.exists()) {
+            theDir.mkdirs();
+        }
+
+        //start two phase
+        PhaseOne.start();
+        PhaseTwo.start();
+
+        System.out.println("Final sorted list is :");
+        displayRandomList("sortedFiles/"+"Sorted"+PhaseOne.fileNumber+".txt");
 
     }
 
