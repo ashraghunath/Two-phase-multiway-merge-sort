@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class PhaseTwo {
-    static List<BufferedReader> listOfFiles = new ArrayList<>();
-    static List<Integer> firstElementsOfFiles = new ArrayList<>();
-    static int numberOfPasses = 0;
-    static int lastFileNumberIndex = 0;
-    static int numberOfFileFromFirstPass = Math.min(PhaseOne.fileNumber, MergeSort.memorySize);
+     static List<BufferedReader> listOfFiles = null;
+     static List<Integer> firstElementsOfFiles = null;
+     static int numberOfPasses = 0;
+     static int lastFileNumberIndex = 0;
+    static int numberOfFileFromFirstPass = 0;
 
     public static void start() {
         System.out.println("\n**********Phase 2 started*********\n");
@@ -24,6 +24,16 @@ public class PhaseTwo {
     }
 
     static void readFiles() throws IOException {
+
+        //reinitialize
+         listOfFiles = new ArrayList<>();
+         firstElementsOfFiles = new ArrayList<>();
+         numberOfPasses = 0;
+         lastFileNumberIndex = 0;
+         numberOfFileFromFirstPass = Math.min(PhaseOne.fileNumber, MergeSort.memorySize);
+
+
+        System.out.println("Number of files from first pass"+numberOfFileFromFirstPass);
         boolean checkIfMergeOrNot = true;
         while (checkIfMergeOrNot) {
             for (int i = 0; i < numberOfFileFromFirstPass; i++) {
@@ -60,6 +70,10 @@ public class PhaseTwo {
             }
             bufferedWriter.close();
             PhaseOne.fileNumber++;
+
+            System.out.println("Intermediate pass result");
+            MergeSort.displayRandomList("sortedFiles/"+"Sorted"+PhaseOne.fileNumber+".txt");
+
             numberOfPasses++;
             lastFileNumberIndex = numberOfPasses * MergeSort.memorySize;
             numberOfFileFromFirstPass = Math.min(MergeSort.memorySize,

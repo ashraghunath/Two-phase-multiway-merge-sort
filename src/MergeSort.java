@@ -20,16 +20,20 @@ public class MergeSort {
         Runtime runtime = Runtime.getRuntime();
         System.out.println("System Available Memory: " + (float) (runtime.totalMemory() / 1000000) + " MB");
 
+        memorySize = (int)(runtime.totalMemory() / 1000000) *500;
+
         Scanner scanner = new Scanner(System.in);
         int operation;
-        System.out.println("Please enter max number of integers in memory");
-        memorySize = Integer.parseInt(scanner.nextLine());
+//        System.out.println("Please enter max number of integers in memory");
+//        memorySize = Integer.parseInt(scanner.nextLine());
 //        memorySize=1000;
         do {
             System.out.println("\n1.\tCreate a random list of integers");
             System.out.println("2.\tDisplay the random list");
             System.out.println("3.\tRun 2PMMS");
             System.out.println("4.\tExit");
+            System.out.println("5.\tCleanup");
+
             System.out.print("Please Choose One operation > ");
             operation = Integer.parseInt(scanner.nextLine());
             if (operation == 1)
@@ -41,9 +45,20 @@ public class MergeSort {
             else if (operation == 3) {
                 twoPMMS();
             }
+            else if(operation==5)
+            {
+                cleanup();
+            }
         } while (operation != 4);
 
-        //cleanup files after use
+
+        //close scanner
+        scanner.close();
+    }
+
+    public static void cleanup()
+    {
+        //        cleanup files after use
 
         File dir = new File("sortedFiles");
         if (dir.exists()) {
@@ -53,10 +68,6 @@ public class MergeSort {
                     file.delete();
             dir.delete();
         }
-
-
-        //close scanner
-        scanner.close();
     }
 
     public static void generateNumbersIntoFile(Scanner scanner) {
@@ -112,6 +123,9 @@ public class MergeSort {
 
     public static void twoPMMS() throws IOException {
 
+        cleanup();
+        PhaseOne.fileNumber=0;
+        PhaseOne.subListCount=0;
         //create directory if it doesnt exist
         File theDir = new File("sortedFiles");
         if (!theDir.exists()) {
